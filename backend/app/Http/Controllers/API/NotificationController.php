@@ -43,4 +43,11 @@ class NotificationController extends Controller
 
         return response()->json(['message' => 'Đã đánh dấu tất cả là đã đọc']);
     }
+
+    public function deleteAll(Request $request)
+    {
+        Notification::where('user_id', $request->user()->id)->delete();
+
+        return response()->json(['message' => 'Đã xóa tất cả thông báo']);
+    }
 }

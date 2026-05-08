@@ -70,7 +70,7 @@ export const CartProvider = ({ children }) => {
                 let newQty = Math.max(1, parseInt(qty) || 1);
                 
                 if (newQty > maxQty) {
-                    alert(`Rất tiếc, bạn không thể nhập quá số lượng ${maxQty} đang có.`);
+                    alert(`Rất tiếc, bạn không thể nhập quá số lượng ${maxQty} sản phẩm đang có.`);
                     newQty = maxQty; // Tự động giảm xuống mức tối đa có thể mua
                 }
                 return { ...item, cartQuantity: newQty };

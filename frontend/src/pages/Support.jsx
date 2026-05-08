@@ -18,6 +18,7 @@ import api from '../api/axios';
 
 const Support = () => {
     const navigate = useNavigate();
+    const token = localStorage.getItem('auth_token');
     const [activeFaq, setActiveFaq] = useState(null);
     const [loading, setLoading] = useState(false);
     const [submitted, setSubmitted] = useState(false);
@@ -27,6 +28,24 @@ const Support = () => {
         subject: '',
         message: ''
     });
+
+    React.useEffect(() => {
+        if (token) {
+            const fetchUserInfo = async () => {
+                try {
+                    const response = await api.get('/user');
+                    setFormData(prev => ({
+                        ...prev,
+                        fullname: response.data.name || '',
+                        email: response.data.email || ''
+                    }));
+                } catch (err) {
+                    console.error('Lỗi lấy thông tin người dùng:', err);
+                }
+            };
+            fetchUserInfo();
+        }
+    }, [token]);
 
     const faqs = [
         {

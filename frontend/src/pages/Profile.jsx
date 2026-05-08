@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { User, Phone, MapPin, Mail, Save, Loader2, Camera } from 'lucide-react';
+import { User, Phone, MapPin, Mail, Save, Loader2, Camera, Star, Award, History, TrendingUp, ChevronRight } from 'lucide-react';
 import api from '../api/axios';
 
 const Profile = () => {
@@ -15,10 +15,31 @@ const Profile = () => {
         address: '',
         gender: ''
     });
+    const [loyalty, setLoyalty] = useState(null);
+    const [loyaltyHistory, setLoyaltyHistory] = useState([]);
 
     useEffect(() => {
-        fetchProfile();
+        const init = async () => {
+            const userData = await fetchProfile();
+            if (userData && userData.role === 1) {
+                fetchLoyalty();
+            }
+        };
+        init();
     }, []);
+
+    const fetchLoyalty = async () => {
+        try {
+            const [statusRes, historyRes] = await Promise.all([
+                api.get('/loyalty/status'),
+                api.get('/loyalty/history')
+            ]);
+            setLoyalty(statusRes.data);
+            setLoyaltyHistory(historyRes.data.data);
+        } catch (err) {
+            console.error('Lỗi khi tải thông tin loyalty:', err);
+        }
+    };
 
     const fetchProfile = async () => {
         try {
@@ -32,8 +53,10 @@ const Profile = () => {
                 address: response.data.address || '',
                 gender: response.data.gender || ''
             });
+            return response.data;
         } catch (err) {
             console.error('Lỗi khi tải thông tin hồ sơ:', err);
+            return null;
         } finally {
             setLoading(false);
         }
@@ -86,15 +109,47 @@ const Profile = () => {
                         <p className="role-badge">
                             {user?.role === 3 ? 'Quản trị viên' : user?.role === 2 ? 'Nhân viên' : 'Khách hàng'}
                         </p>
+
+                        {/* Membership Card - Only for Customers */}
+                        {user?.role === 1 && loyalty && (
+                            <div className={`loyalty-card-mini tier-${loyalty.loyalty_level}`}>
+                                <div className="card-pattern"></div>
+                                <div className="card-content">
+                                    <div className="card-header">
+                                        <Star className="star-icon" size={20} fill="currentColor" />
+                                        <span className="tier-name">{loyalty.loyalty_level.toUpperCase()} MEMBER</span>
+                                    </div>
+                                    <div className="card-points">
+                                        <h3>{loyalty.points.toLocaleString()}</h3>
+                                        <p>Điểm khả dụng</p>
+                                    </div>
+                                    {loyalty.next_level && (
+                                        <div className="card-progress">
+                                            <div className="progress-info">
+                                                <span>Tiến trình lên {loyalty.next_level.name}</span>
+                                                <span>{Math.round(loyalty.next_level.progress)}%</span>
+                                            </div>
+                                            <div className="progress-bar-bg">
+                                                <div 
+                                                    className="progress-bar-fill" 
+                                                    style={{ width: `${loyalty.next_level.progress}%` }}
+                                                ></div>
+                                            </div>
+                                            <p className="needed-points">Cần thêm {loyalty.next_level.points_needed} điểm</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     <div className="profile-info-brief">
                         <div className="info-item">
-                            <Mail size={18} />
-                            <span>{user?.email}</span>
+                            <Mail size={18} className="info-icon" />
+                            <span title={user?.email}>{user?.email}</span>
                         </div>
                         <div className="info-item">
-                            <User size={18} />
+                            <User size={18} className="info-icon" />
                             <span>@{user?.username}</span>
                         </div>
                     </div>
@@ -188,6 +243,48 @@ const Profile = () => {
                         </div>
                     </form>
                 </motion.div>
+
+                {/* Loyalty History Section - Only for Customers */}
+                {user?.role === 1 && (
+                    <motion.div 
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="loyalty-history-section glass-card full-width-mobile"
+                    >
+                        <div className="section-header">
+                            <div className="header-title-flex">
+                                <History size={24} className="text-primary" />
+                                <h2>Lịch sử điểm thưởng</h2>
+                            </div>
+                            <p>Theo dõi các lần tích lũy và sử dụng điểm của bạn</p>
+                        </div>
+
+                        <div className="history-list">
+                            {loyaltyHistory.length === 0 ? (
+                                <div className="no-history">
+                                    <Award size={48} className="text-muted" />
+                                    <p>Bạn chưa có giao dịch điểm nào.</p>
+                                    <span>Mua hàng ngay để bắt đầu tích điểm!</span>
+                                </div>
+                            ) : (
+                                loyaltyHistory.map((item) => (
+                                    <div key={item.id} className="history-item">
+                                        <div className={`item-icon ${item.points > 0 ? 'icon-earn' : 'icon-redeem'}`}>
+                                            {item.points > 0 ? <TrendingUp size={18} /> : <Star size={18} />}
+                                        </div>
+                                        <div className="item-details">
+                                            <h4>{item.description}</h4>
+                                            <span className="item-date">{new Date(item.created_at).toLocaleDateString('vi-VN')}</span>
+                                        </div>
+                                        <div className={`item-points ${item.points > 0 ? 'text-success' : 'text-danger'}`}>
+                                            {item.points > 0 ? '+' : ''}{item.points.toLocaleString()}
+                                        </div>
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </motion.div>
+                )}
             </div>
             )}
 
@@ -212,6 +309,9 @@ const Profile = () => {
                     box-shadow: var(--shadow-md);
                     text-align: center;
                     height: fit-content;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 1.5rem;
                 }
                 
                 .avatar-wrapper {
@@ -249,8 +349,89 @@ const Profile = () => {
                     border-radius: 2rem;
                     font-size: 0.85rem;
                     font-weight: 700;
-                    margin-bottom: 2rem;
+                    margin-bottom: 0.5rem;
                 }
+
+                /* Loyalty Card CSS */
+                .loyalty-card-mini {
+                    position: relative;
+                    width: 100%;
+                    padding: 1.5rem;
+                    border-radius: 1.2rem;
+                    text-align: left;
+                    color: white;
+                    overflow: hidden;
+                    box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+                    transition: transform 0.3s ease;
+                }
+                .loyalty-card-mini:hover { transform: translateY(-5px); }
+                .card-pattern {
+                    position: absolute;
+                    top: 0; left: 0; right: 0; bottom: 0;
+                    background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.1) 1px, transparent 0);
+                    background-size: 16px 16px;
+                    opacity: 0.4;
+                }
+                .card-content { position: relative; z-index: 1; }
+                
+                .tier-bronze { background: linear-gradient(135deg, #a87932 0%, #d4a76a 100%); }
+                .tier-silver { background: linear-gradient(135deg, #717171 0%, #c0c0c0 100%); }
+                .tier-gold { background: linear-gradient(135deg, #b8860b 0%, #ffd700 100%); color: #4a3b00; }
+                .tier-gold .star-icon { color: #4a3b00; }
+                .tier-gold .progress-bar-bg { background: rgba(0,0,0,0.1); }
+                .tier-gold .progress-bar-fill { background: #4a3b00; }
+                .tier-gold .needed-points, .tier-gold .progress-info { color: rgba(74, 59, 0, 0.8); }
+
+                .card-header { display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; }
+                .tier-name { font-size: 0.75rem; font-weight: 800; letter-spacing: 0.1em; }
+                .card-points h3 { font-size: 2.2rem; font-weight: 800; line-height: 1; }
+                .card-points p { font-size: 0.85rem; opacity: 0.9; font-weight: 500; }
+
+                .card-progress { margin-top: 1.5rem; }
+                .progress-info { display: flex; justify-content: space-between; font-size: 0.7rem; font-weight: 600; margin-bottom: 0.4rem; opacity: 0.9; }
+                .progress-bar-bg { width: 100%; height: 6px; background: rgba(255,255,255,0.2); border-radius: 10px; overflow: hidden; }
+                .progress-bar-fill { height: 100%; background: white; border-radius: 10px; }
+                .needed-points { font-size: 0.65rem; margin-top: 0.4rem; opacity: 0.8; font-style: italic; }
+
+                /* Loyalty History CSS */
+                .loyalty-history-section {
+                    grid-column: span 2;
+                    padding: 2.5rem;
+                    margin-top: 1rem;
+                }
+                .header-title-flex { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.3rem; }
+                .header-title-flex h2 { font-size: 1.5rem; color: var(--bg-dark); }
+                .section-header { margin-bottom: 2rem; }
+                .history-list { display: flex; flex-direction: column; gap: 1rem; }
+                .history-item {
+                    display: flex;
+                    align-items: center;
+                    padding: 1.2rem;
+                    background: rgba(255,255,255,0.5);
+                    border: 1px solid var(--border);
+                    border-radius: var(--radius-lg);
+                    transition: var(--transition);
+                }
+                .history-item:hover { background: white; transform: translateX(5px); border-color: var(--primary-light); }
+                .item-icon {
+                    width: 40px; height: 40px;
+                    border-radius: 10px;
+                    display: flex; align-items: center; justify-content: center;
+                    margin-right: 1.2rem;
+                }
+                .icon-earn { background: #ecfdf5; color: #10b981; }
+                .icon-redeem { background: #eff6ff; color: #3b82f6; }
+                .item-details h4 { font-size: 0.95rem; margin-bottom: 0.2rem; color: var(--text-main); }
+                .item-date { font-size: 0.8rem; color: var(--text-muted); }
+                .item-points { margin-left: auto; font-weight: 700; font-size: 1.1rem; }
+                
+                .no-history {
+                    text-align: center;
+                    padding: 4rem 2rem;
+                    color: var(--text-muted);
+                }
+                .no-history p { font-size: 1.1rem; margin-top: 1rem; color: var(--text-main); font-weight: 600; }
+                .no-history span { font-size: 0.9rem; }
                 
                 .profile-info-brief {
                     text-align: left;
@@ -264,6 +445,16 @@ const Profile = () => {
                     margin-bottom: 1rem;
                     color: var(--text-muted);
                     font-size: 0.9rem;
+                    width: 100%;
+                }
+                .info-item span {
+                    white-space: nowrap;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                }
+                .info-icon {
+                    color: var(--primary);
+                    flex-shrink: 0;
                 }
                 
                 .profile-content {

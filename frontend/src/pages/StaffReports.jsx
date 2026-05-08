@@ -1,11 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-    FileText, 
     Download, 
-    Send, 
     Calendar, 
-    CheckCircle2,
-    ArrowRight,
     Loader2
 } from 'lucide-react';
 import api from '../api/axios';
@@ -15,7 +11,6 @@ const StaffReports = () => {
     const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
     const [reportData, setReportData] = useState([]);
     const [loading, setLoading] = useState(false);
-    const [isSent, setIsSent] = useState(false);
     const dateInputRef = useRef(null);
 
     useEffect(() => {
@@ -34,20 +29,6 @@ const StaffReports = () => {
         }
     };
 
-    const handleSendReport = () => {
-        setIsSent(true);
-        // Phát sự kiện thông báo lên hệ thống (bắt bởi chuông thông báo)
-        const event = new CustomEvent('system-notification', { 
-            detail: { 
-                id: Date.now(), 
-                message: 'Báo cáo đã được gửi cho Admin thành công!', 
-                time: new Date().toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) 
-            } 
-        });
-        window.dispatchEvent(event);
-
-        setTimeout(() => setIsSent(false), 3000);
-    };
 
     const handleCalendarClick = () => {
         dateInputRef.current.showPicker();
@@ -66,16 +47,6 @@ const StaffReports = () => {
                 <div className="header-title">
                     <h1>Báo cáo Bán hàng</h1>
                     <p>Dữ liệu thực tế được tổng hợp tự động từ các đơn hàng đã hoàn thành.</p>
-                </div>
-                <div className="header-actions">
-                    <button 
-                        className={`btn-action ${isSent ? 'btn-complete' : 'btn-prepare'}`}
-                        onClick={handleSendReport}
-                        disabled={isSent || reportData.length === 0}
-                    >
-                        {isSent ? <CheckCircle2 size={18} /> : <Send size={18} />}
-                        <span>{isSent ? 'Đã gửi báo cáo' : 'Gửi cho Admin'}</span>
-                    </button>
                 </div>
             </header>
 
