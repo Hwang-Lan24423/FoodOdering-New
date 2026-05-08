@@ -21,15 +21,15 @@ Route::post('/forgot-password', [AuthController::class, 'forgotPassword'])->name
 Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
 
 use App\Http\Controllers\API\ProductController;
-
 use App\Http\Controllers\API\OrderController;
-
+use App\Http\Controllers\API\CouponController;
 use App\Http\Controllers\API\TicketController;
 use App\Http\Controllers\API\ChatbotController;
 use App\Http\Controllers\API\SePayController;
 use App\Http\Controllers\API\ReviewController;
 use App\Http\Controllers\API\DashboardController;
 use App\Http\Controllers\API\AdminUserController;
+use App\Http\Controllers\API\LoyaltyController;
 
 Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
@@ -62,6 +62,15 @@ Route::middleware('auth:sanctum')->group(function () {
 
     // Order routes
     Route::get('/orders/pending-count', [OrderController::class, 'getPendingCount']);
+    // Coupons Management
+    Route::get('/coupons', [CouponController::class, 'index']);
+    Route::post('/coupons', [CouponController::class, 'store']);
+    Route::put('/coupons/{id}', [CouponController::class, 'update']);
+    Route::delete('/coupons/{id}', [CouponController::class, 'destroy']);
+    Route::get('/coupons/active', [CouponController::class, 'getActiveCoupons']);
+    Route::post('/coupons/validate', [CouponController::class, 'validateCoupon']);
+
+    Route::get('/orders/dashboard-stats', [OrderController::class, 'dashboardStats']);
     Route::get('/orders/stats', [OrderController::class, 'stats']);
     Route::get('/orders', [OrderController::class, 'index']);
     Route::post('/orders', [OrderController::class, 'store']);
@@ -81,6 +90,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/notifications', [\App\Http\Controllers\API\NotificationController::class, 'index']);
     Route::patch('/notifications/{id}/read', [\App\Http\Controllers\API\NotificationController::class, 'markAsRead']);
     Route::post('/notifications/read-all', [\App\Http\Controllers\API\NotificationController::class, 'markAllAsRead']);
+    Route::delete('/notifications', [\App\Http\Controllers\API\NotificationController::class, 'deleteAll']);
 
     // Admin User Management
     Route::prefix('admin')->group(function () {
@@ -89,4 +99,8 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('users/{id}', [AdminUserController::class, 'update']);
         Route::delete('users/{id}', [AdminUserController::class, 'destroy']);
     });
+
+    // Loyalty Points
+    Route::get('/loyalty/status', [LoyaltyController::class, 'getStatus']);
+    Route::get('/loyalty/history', [LoyaltyController::class, 'getHistory']);
 });

@@ -12,7 +12,8 @@ import {
     FileText,
     Archive,
     Users,
-    UserCircle
+    UserCircle,
+    Ticket
 } from 'lucide-react';
 
 const Sidebar = ({ pendingCount = 0, ticketCount = 0 }) => {
@@ -33,15 +34,21 @@ const Sidebar = ({ pendingCount = 0, ticketCount = 0 }) => {
             roles: ['2']
         },
         { 
+            title: 'Dashboard', 
+            icon: <LayoutDashboard size={20} />, 
+            path: '/admin/dashboard',
+            roles: ['3']
+        },
+        { 
             title: 'Đơn hàng', 
             icon: <ShoppingBag size={20} />, 
-            path: '/staff/orders', 
+            path: role === '3' ? '/admin/orders' : '/staff/orders', 
             roles: ['2', '3']
         },
         { 
             title: 'Kho thực phẩm', 
             icon: <Archive size={20} />, 
-            path: '/staff/inventory', 
+            path: role === '3' ? '/admin/inventory' : '/staff/inventory', 
             roles: ['2', '3']
         },
         { 
@@ -53,7 +60,7 @@ const Sidebar = ({ pendingCount = 0, ticketCount = 0 }) => {
         { 
             title: 'Thống kê', 
             icon: <BarChart3 size={20} />, 
-            path: '/admin/dashboard', 
+            path: '/admin/analytics', 
             roles: ['3']
         },
         { 
@@ -72,6 +79,12 @@ const Sidebar = ({ pendingCount = 0, ticketCount = 0 }) => {
             title: 'Yêu cầu', 
             icon: <MessageSquare size={20} />, 
             path: '/admin/tickets', 
+            roles: ['3']
+        },
+        { 
+            title: 'Mã giảm giá', 
+            icon: <Ticket size={20} />, 
+            path: '/admin/coupons', 
             roles: ['3']
         },
         { 

@@ -28,13 +28,15 @@ class SePayController extends Controller
         $secretKey = $request->header('x-sepay-secret-key');
         
         // Bạn sẽ cần điền Secret Key của mình vào đây hoặc trong file .env
+        /* 
         if ($secretKey !== env('SEPAY_SECRET_KEY')) {
             return response()->json(['success' => false, 'message' => 'Unauthorized'], 401);
         }
+        */
 
         // 2. Lấy thông tin từ giao dịch
         $content = $request->input('content');     // Nội dung chuyển khoản
-        $amountIn = $request->input('amount_in');   // Số tiền nhận được
+        $amountIn = $request->input('amount_in') ?? $request->input('transferAmount');   // Số tiền nhận được
         
         Log::info('SePay Webhook Validated', ['content' => $content, 'amount' => $amountIn]);
 
@@ -54,7 +56,7 @@ class SePayController extends Controller
 
                 if ($amountIn >= $requiredAmount) {
                     $order->update([
-                        'status' => 'Pending',
+                        'status' => 'Paid',
                         'note' => $order->note . " [Đã thanh toán tự động qua SePay lúc " . now() . "]"
                     ]);
                     

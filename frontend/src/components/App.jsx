@@ -18,11 +18,13 @@ import Support from '../pages/Support';
 import StaffDashboard from '../pages/StaffDashboard';
 import StaffOrders from '../pages/StaffOrders';
 import AdminDashboard from '../pages/AdminDashboard';
+import AdminAnalytics from '../pages/AdminAnalytics';
 import StaffReports from '../pages/StaffReports';
 import StaffInventory from '../pages/StaffInventory';
 import AdminCustomers from '../pages/AdminCustomers';
 import AdminStaffs from '../pages/AdminStaffs';
 import AdminTickets from '../pages/AdminTickets';
+import AdminCoupons from '../pages/AdminCoupons';
 import Chatbot from './Support/Chatbot';
 
 const AppContent = () => {
@@ -43,12 +45,16 @@ const AppContent = () => {
                 <Routes>
                     <Route path="/staff/dashboard" element={<StaffDashboard />} />
                     <Route path="/staff/orders" element={<StaffOrders />} />
+                    <Route path="/admin/orders" element={<StaffOrders />} />
                     <Route path="/staff/inventory" element={<StaffInventory />} />
+                    <Route path="/admin/inventory" element={<StaffInventory />} />
                     <Route path="/staff/reports" element={<StaffReports />} />
                     <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                    <Route path="/admin/analytics" element={<AdminAnalytics />} />
                     <Route path="/admin/customers" element={<AdminCustomers />} />
                     <Route path="/admin/staffs" element={<AdminStaffs />} />
                     <Route path="/admin/tickets" element={<AdminTickets />} />
+                    <Route path="/admin/coupons" element={<AdminCoupons />} />
                     <Route path="/profile" element={<Profile />} />
                     <Route path="/support" element={<Support />} />
                     {/* Fallback cho management */}

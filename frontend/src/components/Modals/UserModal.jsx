@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { X, Loader2, Mail, User, Phone, MapPin, Key } from 'lucide-react';
+import { X, Loader2, Mail, User, Phone, MapPin, Key, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../api/axios';
 
@@ -13,6 +13,7 @@ const UserModal = ({ isOpen, onClose, user, type, onSuccess, readOnly = false })
         address: '',
         gender: 'Khác',
         password: '',
+        points: 0,
         role: type === 'staff' ? 2 : 1
     });
 
@@ -26,6 +27,7 @@ const UserModal = ({ isOpen, onClose, user, type, onSuccess, readOnly = false })
                 address: user.address || '',
                 gender: user.gender || 'Khác',
                 password: '', // Không điền mật khẩu cũ
+                points: user.points || 0,
                 role: user.role
             });
         } else {
@@ -37,6 +39,7 @@ const UserModal = ({ isOpen, onClose, user, type, onSuccess, readOnly = false })
                 address: '',
                 gender: 'Khác',
                 password: '',
+                points: 0,
                 role: type === 'staff' ? 2 : 1
             });
         }
@@ -174,6 +177,21 @@ const UserModal = ({ isOpen, onClose, user, type, onSuccess, readOnly = false })
                                         placeholder={user ? "Nhập mật khẩu mới..." : "Mật khẩu cho tài khoản"}
                                         required={!user}
                                         minLength={6}
+                                    />
+                                </div>
+                            )}
+
+                            {type === 'customer' && (
+                                <div className="form-group">
+                                    <label><Star size={16}/> Điểm tích lũy</label>
+                                    <input 
+                                        type="number" 
+                                        name="points" 
+                                        value={formData.points} 
+                                        onChange={handleChange} 
+                                        placeholder="0"
+                                        min="0"
+                                        disabled={readOnly}
                                     />
                                 </div>
                             )}

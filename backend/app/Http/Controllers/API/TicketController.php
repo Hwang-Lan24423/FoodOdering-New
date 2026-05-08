@@ -44,12 +44,30 @@ class TicketController extends Controller
         $ticket = Ticket::findOrFail($id);
         $ticket->update(['status' => $request->status]);
 
+        // Nếu chưa có user_id, cố gắng tìm người dùng theo email
+        if (!$ticket->user_id) {
+            $user = \App\Models\User::where('email', $ticket->email)->first();
+            if ($user) {
+                $ticket->user_id = $user->id;
+                $ticket->save();
+            }
+        }
+
         // Gửi thông báo nếu có user_id
         if ($ticket->user_id) {
+            $statusVn = [
+                'Pending' => 'Đang chờ',
+                'Processing' => 'Đang xử lý',
+                'Resolved' => 'Đã giải quyết',
+                'Rejected' => 'Đã từ chối',
+                'Open' => 'Mới'
+            ];
+            $currentStatus = $statusVn[$request->status] ?? $request->status;
+
             \App\Models\Notification::send(
                 $ticket->user_id,
                 'Yêu cầu hỗ trợ đã cập nhật',
-                'Yêu cầu "' . $ticket->subject . '" đã được chuyển sang trạng thái: ' . $request->status,
+                'Yêu cầu "' . $ticket->subject . '" đã được chuyển sang trạng thái: ' . $currentStatus,
                 'support',
                 '/support'
             );

@@ -185,11 +185,11 @@ const AdminStaffs = () => {
                 .table-container { padding: 1.5rem; }
                 .table-toolbar { display: flex; justify-content: space-between; margin-bottom: 1.5rem; }
                 .search-box { position: relative; width: 320px; }
-                .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: #94a3b8; }
+                .search-icon { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); color: #94a3b8; pointer-events: none; }
                 .search-box input {
-                    width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem;
+                    width: 100%; padding: 0.6rem 1rem 0.6rem 2.8rem;
                     border: 1px solid #e2e8f0; border-radius: 20px;
-                    background: #f8fafc; transition: all 0.2s;
+                    background: #f8fafc; transition: all 0.2s; font-size: 0.9rem;
                 }
                 .search-box input:focus {
                     background: white; border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px var(--primary-light);

@@ -65,6 +65,7 @@ const StaffOrders = () => {
     const getStatusColor = (status) => {
         switch (status) {
             case 'Pending': return 'status-pending';
+            case 'Paid': return 'status-completed'; // Dùng màu xanh của completed cho Paid
             case 'Preparing': return 'status-preparing';
             case 'Completed': return 'status-completed';
             case 'Cancelled': return 'status-cancelled';
@@ -75,6 +76,7 @@ const StaffOrders = () => {
     const getStatusIcon = (status) => {
         switch (status) {
             case 'Pending': return <Clock size={16} />;
+            case 'Paid': return <CheckCircle2 size={16} />;
             case 'Preparing': return <ChefHat size={16} />;
             case 'Completed': return <CheckCircle2 size={16} />;
             case 'Cancelled': return <XCircle size={16} />;
@@ -94,13 +96,13 @@ const StaffOrders = () => {
             <header className="dashboard-header">
                 <div className="header-title">
                     <h1>Quản lý Vận hành</h1>
-                    <p>Chào ngày mới! Bạn có {orders.filter(o => o.status === 'Pending').length} đơn hàng mới cần xử lý.</p>
+                    <p>Chào ngày mới! Bạn có {orders.filter(o => o.status === 'Pending' || o.status === 'Paid').length} đơn hàng mới cần xử lý.</p>
                 </div>
                 <div className="header-stats">
                     <div className="stat-card glass-card">
                         <Clock className="text-pending" />
                         <div>
-                            <span>{orders.filter(o => o.status === 'Pending').length}</span>
+                            <span>{orders.filter(o => o.status === 'Pending' || o.status === 'Paid').length}</span>
                             <p>Chờ xử lý</p>
                         </div>
                     </div>
@@ -139,13 +141,19 @@ const StaffOrders = () => {
                     />
                 </div>
                 <div className="filter-tabs">
-                    {['All', 'Pending', 'Preparing', 'Completed', 'Cancelled'].map(status => (
+                    {[
+                        { id: 'All', label: 'Tất cả' },
+                        { id: 'Pending', label: 'Chờ xử lý' },
+                        { id: 'Preparing', label: 'Đang chuẩn bị' },
+                        { id: 'Completed', label: 'Đã hoàn thành' },
+                        { id: 'Cancelled', label: 'Đã hủy' }
+                    ].map(tab => (
                         <button 
-                            key={status}
-                            className={`filter-btn ${filterStatus === status ? 'active' : ''}`}
-                            onClick={() => setFilterStatus(status)}
+                            key={tab.id}
+                            className={`filter-btn ${filterStatus === tab.id ? 'active' : ''}`}
+                            onClick={() => setFilterStatus(tab.id)}
                         >
-                            {status === 'All' ? 'Tất cả' : status}
+                            {tab.label}
                         </button>
                     ))}
                 </div>
@@ -196,12 +204,16 @@ const StaffOrders = () => {
                                     <td>
                                         <span className={`status-badge ${getStatusColor(order.status)}`}>
                                             {getStatusIcon(order.status)}
-                                            {order.status}
+                                            {order.status === 'Pending' ? 'Chờ xử lý' : 
+                                             order.status === 'Preparing' ? 'Đang chuẩn bị' : 
+                                             order.status === 'Completed' ? 'Đã hoàn thành' : 
+                                             order.status === 'Cancelled' ? 'Đã hủy' : 
+                                             order.status === 'Paid' ? 'Đã thanh toán' : order.status}
                                         </span>
                                     </td>
                                     <td>
                                         <div className="action-buttons">
-                                            {order.status === 'Pending' && (
+                                            {order.status === 'Paid' && (
                                                 <button 
                                                     className="btn-action btn-prepare"
                                                     onClick={() => updateStatus(order.id, 'Preparing')}

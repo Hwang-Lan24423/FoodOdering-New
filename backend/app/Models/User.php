@@ -29,6 +29,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'gender',
         'role',
         'password',
+        'points',
+        'total_points_earned',
+        'loyalty_level',
     ];
 
     public function orders()
@@ -56,7 +59,14 @@ class User extends Authenticatable implements MustVerifyEmail
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'points' => 'integer',
+            'total_points_earned' => 'integer',
         ];
+    }
+
+    public function loyaltyTransactions()
+    {
+        return $this->hasMany(LoyaltyTransaction::class);
     }
 
     public function sendPasswordResetNotification($token)

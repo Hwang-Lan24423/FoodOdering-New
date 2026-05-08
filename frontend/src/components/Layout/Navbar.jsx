@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, LogOut, Utensils, Bell, X, Check } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Utensils, Bell, X, Check, CheckCheck, Trash2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import api from '../../api/axios';
 import { useCart } from '../../context/CartContext';
@@ -40,6 +40,27 @@ const Navbar = () => {
             setUnreadCount(prev => Math.max(0, prev - 1));
         } catch (err) {
             console.error('Lỗi đánh dấu đã đọc:', err);
+        }
+    };
+
+    const handleMarkAllAsRead = async () => {
+        try {
+            await api.post('/notifications/read-all');
+            setNotifications(notifications.map(n => ({ ...n, is_read: true })));
+            setUnreadCount(0);
+        } catch (err) {
+            console.error('Lỗi đánh dấu tất cả đã đọc:', err);
+        }
+    };
+
+    const handleDeleteAll = async () => {
+        if (!window.confirm('Bạn có chắc chắn muốn xóa tất cả thông báo?')) return;
+        try {
+            await api.delete('/notifications');
+            setNotifications([]);
+            setUnreadCount(0);
+        } catch (err) {
+            console.error('Lỗi xóa tất cả thông báo:', err);
         }
     };
 
@@ -94,7 +115,27 @@ const Navbar = () => {
                                     >
                                         <div className="notification-header">
                                             <h3>Thông báo</h3>
-                                            <button onClick={() => setShowNotifications(false)}><X size={16} /></button>
+                                            <div className="notification-header-actions">
+                                                {notifications.length > 0 && (
+                                                    <>
+                                                        <button 
+                                                            className="action-btn" 
+                                                            onClick={handleMarkAllAsRead}
+                                                            title="Đọc tất cả"
+                                                        >
+                                                            <CheckCheck size={16} />
+                                                        </button>
+                                                        <button 
+                                                            className="action-btn delete" 
+                                                            onClick={handleDeleteAll}
+                                                            title="Xóa tất cả"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                        </button>
+                                                    </>
+                                                )}
+                                                <button onClick={() => setShowNotifications(false)}><X size={16} /></button>
+                                            </div>
                                         </div>
                                         <div className="notification-list">
                                             {notifications.length === 0 ? (

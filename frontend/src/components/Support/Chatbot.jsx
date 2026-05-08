@@ -144,7 +144,15 @@ const Chatbot = () => {
                 .message-row.user { justify-content: flex-end; }
                 .message-row.bot { justify-content: flex-start; }
                 
-                .message-bubble { max-width: 80%; padding: 0.8rem 1rem; border-radius: 1.2rem; font-size: 0.9rem; line-height: 1.5; }
+                .message-bubble { 
+                    max-width: 85%; 
+                    padding: 0.8rem 1rem; 
+                    border-radius: 1.2rem; 
+                    font-size: 0.9rem; 
+                    line-height: 1.5; 
+                    overflow-wrap: break-word;
+                    word-break: break-word;
+                }
                 .user .message-bubble { background: var(--primary); color: white; border-bottom-right-radius: 0.2rem; }
                 .bot .message-bubble { background: white; color: var(--text-main); border-bottom-left-radius: 0.2rem; box-shadow: var(--shadow-sm); }
                 

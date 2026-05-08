@@ -62,6 +62,7 @@ class AdminUserController extends Controller
             'address' => 'nullable|string',
             'gender' => 'nullable|string|in:male,female,other,Nam,Nữ,Khác',
             'password' => 'nullable|string|min:6',
+            'points' => 'nullable|integer|min:0',
         ]);
 
         // Nếu có truyền mật khẩu mới
@@ -71,11 +72,21 @@ class AdminUserController extends Controller
             unset($validated['password']); // Loại bỏ để không ghi đè thành rỗng
         }
 
+        // Nếu admin sửa điểm, cập nhật cả tổng điểm tích lũy để thăng/hạ hạng tương ứng
+        if (isset($validated['points'])) {
+            $user->total_points_earned = $validated['points'];
+        }
+
         $user->update($validated);
+
+        // Cập nhật hạng thành viên nếu là khách hàng
+        if ($user->role == 1) {
+            app(\App\Services\LoyaltyService::class)->updateLevel($user);
+        }
 
         return response()->json([
             'message' => 'Thông tin đã được cập nhật!',
-            'user' => $user
+            'user' => $user->fresh()
         ]);
     }
 

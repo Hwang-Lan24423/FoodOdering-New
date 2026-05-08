@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Search, Edit2, Trash2, Mail, Phone, Calendar, Loader2, AlertCircle, Eye } from 'lucide-react';
+import { Plus, Search, Edit2, Trash2, Mail, Phone, Calendar, Loader2, AlertCircle, Eye, Star } from 'lucide-react';
 import api from '../api/axios';
 import UserModal from '../components/Modals/UserModal';
 
@@ -108,6 +108,7 @@ const AdminCustomers = () => {
                                     <th>Liên hệ</th>
                                     <th>Giới tính</th>
                                     <th>Ngày tham gia</th>
+                                    <th>Loyalty</th>
                                     <th>Hành động</th>
                                 </tr>
                             </thead>
@@ -138,6 +139,15 @@ const AdminCustomers = () => {
                                         <td>
                                             <div className="flex items-center gap-1 text-gray-500 text-sm">
                                                 <Calendar size={14} /> {formatDate(customer.created_at)}
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <div className="loyalty-cell">
+                                                <div className={`level-tag ${customer.loyalty_level}`}>
+                                                    <Star size={12} fill="currentColor" />
+                                                    {customer.loyalty_level.toUpperCase()}
+                                                </div>
+                                                <p className="points-text"><strong>{(customer.points || 0).toLocaleString()}</strong> điểm</p>
                                             </div>
                                         </td>
                                         <td>
@@ -190,13 +200,13 @@ const AdminCustomers = () => {
                     position: relative; width: 320px;
                 }
                 .search-icon {
-                    position: absolute; left: 12px; top: 50%; transform: translateY(-50%);
-                    color: #94a3b8;
+                    position: absolute; left: 16px; top: 50%; transform: translateY(-50%);
+                    color: #94a3b8; pointer-events: none;
                 }
                 .search-box input {
-                    width: 100%; padding: 0.6rem 1rem 0.6rem 2.5rem;
+                    width: 100%; padding: 0.6rem 1rem 0.6rem 2.8rem;
                     border: 1px solid #e2e8f0; border-radius: 20px;
-                    background: #f8fafc; transition: all 0.2s;
+                    background: #f8fafc; transition: all 0.2s; font-size: 0.9rem;
                 }
                 .search-box input:focus {
                     background: white; border-color: var(--primary); outline: none; box-shadow: 0 0 0 3px var(--primary-light);
@@ -247,6 +257,18 @@ const AdminCustomers = () => {
                 }
                 .empty-state h3 { font-size: 1.1rem; color: #1e293b; margin-bottom: 0.5rem; }
                 .empty-state p { color: #64748b; font-size: 0.95rem; }
+
+                .loyalty-cell { display: flex; flex-direction: column; gap: 0.3rem; }
+                .level-tag {
+                    display: inline-flex; align-items: center; gap: 0.3rem;
+                    padding: 0.2rem 0.6rem; border-radius: 4px;
+                    font-size: 0.65rem; font-weight: 800; width: fit-content;
+                }
+                .level-tag.bronze { background: #fef3c7; color: #92400e; }
+                .level-tag.silver { background: #f1f5f9; color: #475569; }
+                .level-tag.gold { background: #fef9c3; color: #854d0e; border: 1px solid #fde047; }
+                .points-text { font-size: 0.8rem; color: #64748b; }
+                .points-text strong { color: var(--secondary); }
             `}</style>
         </div>
     );
